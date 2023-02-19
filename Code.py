@@ -19,18 +19,8 @@ font = pygame.font.Font("freesansbold.ttf", 32)
 #Colors
 RED = (255, 0, 0)
 BLUE = (1, 175, 209)
-
-#Set initial values
-score = 0
-hit_ratio = 100
-hit = 0
-miss = 0
-current_time = 2000
-pass_time = 0
-blue_or_green = 1
-PLAYER_STARTING_LIVES = 5
-siu_1lan = 1
-
+YELLOW = (255,255,0)
+BLACK = (0, 0, 0)
 
 # backgroung at wait screen
 startGame = True
@@ -44,84 +34,17 @@ start_game_2_rect = start_game_bg_2.get_rect()
 
 buttonRect = pygame.Rect(510, 463, 268, 204)
 
-
-#Set hub
-player_live = PLAYER_STARTING_LIVES
-score_text = font.render("Score: " + str(score), True, RED)
-score_rect = score_text.get_rect()
-score_rect.topleft = (5, 10)
-
-player_text = font.render("Live: " + str(PLAYER_STARTING_LIVES), True, RED)
-player_rect = player_text.get_rect()
-player_rect.topleft = (5, 40)
-
-hit_text = font.render("Hit ratio: " + str(hit_ratio) + "%", True, RED)  
-hit_rect = hit_text.get_rect()
-hit_rect.topright = (WINDOW_WIDTH - 5, 10)
-
-game_over_text = font.render("GAME OVER", True, BLUE, RED)
-game_over_rect = game_over_text.get_rect()
-game_over_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2 - 64)
-
-continue_text = font.render("Press space to play again", True, RED, BLUE)
-continue_rect = continue_text.get_rect()
-continue_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2)
-
-score_record_text = font.render("Your score is: " + str(score), True, RED, BLUE)
-score_record_rect = score_record_text.get_rect()
-score_record_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2 + 64)
-
 #Set images
-# siuuuuu
-ronaldo_image = pygame.image.load("ronaldo_siu.png")
-ronaldo_image = pygame.transform.scale(ronaldo_image, (ronaldo_image.get_width()*2.5, ronaldo_image.get_height()*2.5))
 #background image
 background_image = pygame.image.load("sanbong.jpg")
 background_rect = background_image.get_rect()
 background_rect.topleft = (0, 0)
 
-#score image
-score_ronaldo_image = pygame.image.load("anmung.png")
-score_ronaldo_image = pygame.transform.scale(score_ronaldo_image, (score_ronaldo_image.get_width()/2, score_ronaldo_image.get_height()/2))
-score_ronaldo_rect = score_ronaldo_image.get_rect()
-score_ronaldo_rect.bottomright = (1200, 700)
+lose_background_image = pygame.image.load("lose_background.png")
+lose_background_image = pygame.transform.scale(lose_background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
+lose_background_rect = background_image.get_rect()
+lose_background_rect.topleft = (0, 0)
 
-
-#right enemy image
-mob_image = pygame.image.load("khungthanh.png")
-mob_image = pygame.transform.scale(mob_image, (mob_image.get_width()/3, mob_image.get_height()/3))
-mob_rect = mob_image.get_rect()
-
-#afer click
-mob_image_after = pygame.image.load("bongtungluoi.png")
-mob_image_after = pygame.transform.scale(mob_image_after, (mob_image_after.get_width()/3, mob_image_after.get_height()/3))
-
-#Make the first appearance out of screen
-mob_rect.x = -100
-mob_rect.y = -100
-
-#wrong enemy
-blue_mob_image = pygame.image.load("neuer_1.png")
-blue_mob_image = pygame.transform.scale(blue_mob_image, (blue_mob_image.get_width()/3, blue_mob_image.get_height()/3))
-blue_mob_rect = blue_mob_image.get_rect()
-
-
-#after click
-blue_mob_image_after = pygame.image.load("neuer.png")
-blue_mob_image_after = pygame.transform.scale(blue_mob_image_after, (blue_mob_image_after.get_width()/3, blue_mob_image_after.get_height()/3))
-
-#Make the first appearance out of screen
-blue_mob_rect.x = -100
-blue_mob_rect.y = -100
-
-#Hammer image=>>ball
-hammer_image = pygame.image.load("quabong.png")
-hammer_image_x = hammer_image.get_width()
-hammer_image = pygame.transform.scale(hammer_image, (hammer_image.get_width()/8, hammer_image.get_height()/8))
-hammer_rect = hammer_image.get_rect()
-#Make the first appearance out of screen
-hammer_rect.centerx = -100
-hammer_rect.centery = -100
 
 #where zombie appearance
 appearance_image = pygame.image.load("noixuathien.png")
@@ -176,157 +99,298 @@ pygame.mixer.music.load("wc_music.wav")
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1, 0.0)
 
-running = True
-while running:  
-    
-    current_time = pygame.time.get_ticks()
-    while (current_time - pass_time > 1500):
-        pass_time = current_time
-        #1 is green
-        #-1 is blue
-        blue_or_green = random.choice([1, 2, 3])
-        
-        #decide where Mob will spawn
-        mob_x = random.choice(list_matrix)
-        mob_y = random.choice(list_matrix)
-        
-        if blue_or_green == 1 or blue_or_green == 2:
-            mob_rect.centerx = 300*mob_x + 255
-            mob_rect.centery = 240*mob_y + 120
-            
-        else:
-            blue_mob_rect.centerx = 300*mob_x + 255
-            blue_mob_rect.centery = 240*mob_y + 90
-        
-    #get mouse position constantly
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    #Attach hammer to mouse
-    
-    #Check event of the game
-    for event in pygame.event.get():
-        #Check to see if player move the mouse
-        if event.type == pygame.MOUSEMOTION:
-            hammer_rect.centerx = mouse_x
-            hammer_rect.centery = mouse_y
+class Game():
+    def __init__(self, player_group, mob_group, running_time):
+        self.score = 0
+        self.hit_ratio = 100
+        self.hit = 0
+        self.miss = 0
+        self.pass_time = 0
+        self.STARTING_LIVES = 100
+        self.lives = self.STARTING_LIVES
+        self.time_to_switch = 1500
 
-        #Check to see if the user wants to quit
+        self.player_group = player_group
+        self.mob_group = mob_group
+    
+        self.running_time = running_time
+        self.Turn_On_Music = True
+    
+    def draw(self):
+        #Set hub
+        player_live = self.STARTING_LIVES
+        score_text = font.render("Score: " + str(self.score), True, RED)
+        score_rect = score_text.get_rect()
+        score_rect.topleft = (5, 10)
+
+        player_text = font.render("Live: " + str(self.lives), True, RED)
+        player_rect = player_text.get_rect()
+        player_rect.topleft = (5, 40)
+
+        hit_text = font.render("Hit ratio: " + str(self.hit_ratio) + "%", True, RED)  
+        hit_rect = hit_text.get_rect()
+        hit_rect.topright = (WINDOW_WIDTH - 5, 10)
+
+        self.game_over_text = font.render("GAME OVER", True, YELLOW, BLACK)
+        self.game_over_rect = self.game_over_text.get_rect()
+        self.game_over_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2 - 64)
+
+        self.continue_text = font.render("Press space to play again", True, YELLOW, BLACK)
+        self.continue_rect = self.continue_text.get_rect()
+        self.continue_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2)
+
+        self.score_record_text = font.render("Your score is: " + str(self.score), True, YELLOW, BLACK)
+        self.score_record_rect = self.score_record_text.get_rect()
+        self.score_record_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2 + 64)
+        
+        self.Music_box_on = pygame.image.load('Music_on.png')
+        self.Music_box_on = pygame.transform.scale(self.Music_box_on, (64,64))
+        
+        self.Music_box_off = pygame.image.load('Music_off.png')
+        self.Music_box_off = pygame.transform.scale(self.Music_box_off, (64,64))
+        
+        self.Music_box_rect = self.Music_box_on.get_rect()
+        self.Music_box_rect.topright = (WINDOW_WIDTH - 5, 35)
+        
+        display_surface.blit(score_text, score_rect)
+        display_surface.blit(player_text, player_rect)
+        display_surface.blit(hit_text, hit_rect)
+        display_surface.blit(self.Music_box_on, self.Music_box_rect)
+              
+    def update(self):
+        self.Add_mob() 
+        self.Game_over()
+                 
+              
+    def Add_mob(self):
+        #set time to switch
+        current_time = pygame.time.get_ticks()
+        if (current_time - self.pass_time >= self.time_to_switch):
+            self.pass_time = current_time
+            
+            list_matrix = [0,1,2]
+            
+            #Kiem tra mob sinh ra co tai vi tri da ton tai mob, neu co random lai
+            isNotDuplicated = True
+            while isNotDuplicated:
+                isNotDuplicated = False
+                x = random.choice(list_matrix)
+                y = random.choice(list_matrix)
+                mob_x = 300*x + 255
+                mob_y = 240*y + 120
+                
+                for mob_temp in Mob_group:
+                    if mob_x == mob_temp.x and mob_y == mob_temp.y:
+                        isNotDuplicated = True
+            
+            current_time = pygame.time.get_ticks()
+            Decide_Mob = bool(random.getrandbits(1))
+            
+            
+            #adjust the time of mob to exist
+            time_to_live = 2000
+            if (current_time - self.running_time > 10000):
+                    time_to_live = 1500
+            if (current_time - self.running_time > 20000):
+                    time_to_live = 1000
+            if (current_time - self.running_time > 30000):
+                    time_to_live = 500       
+            
+            zombie = mob(mob_x, mob_y, current_time, time_to_live ,Decide_Mob)
+            Mob_group.add(zombie)
+            
+    def check_collision(self):
+            #Check Music Button
+            for player in self.player_group:
+                Music_collision = self.Music_box_rect.colliderect(player.rect)
+                if Music_collision == True:
+                    if self.Turn_On_Music == False:
+                        pygame.mixer.music.play(-1, 0.0) 
+                        self.Turn_On_Music = True
+                    else:
+                        pygame.mixer.music.stop()
+                        self.Turn_On_Music = False
+
+            #at this point, player pressed left mouse, so we need to do mouse animation
+            for Player in self.player_group:
+                Player.get_pressed()
+               
+            collapse_Mobs = pygame.sprite.groupcollide(Mob_group, Player_group, False, False)
+            #Tinh toan diem khi da bong trung doi tuong 
+            for Mob in collapse_Mobs:
+                if (Mob.visited):
+                    #Change animation for the mouse
+                    
+                    Mob.mile_stone = pygame.time.get_ticks()
+                    #set time to live cho dead animation
+                    Mob.time_to_live = 500
+                    Mob.visited = False
+                    
+                    if (Mob.Good_or_bad == True):
+                        hit_sound.play()
+                        self.score += 1
+                        
+                        self.hit += 1
+                        self.hit_ratio = round(self.hit / (self.hit + self.miss) * 100)
+                    else:
+                        lose_sound.play()
+                        self.lives -= 1
+                        
+                        self.miss += 1
+                        self.hit_ratio = round(self.hit / (self.hit + self.miss) * 100) 
+                Mob.image = Mob.animated_sprites[1]
+    def reset(self):
+        self.hit = 0
+        self.miss = 0
+        self.hit_ratio = 0
+        self.score = 0
+        self.lives = self.STARTING_LIVES
+        self.running_time = 0
+        self.mob_group.empty()
+
+    
+    def Game_over(self):
+        global running
+            #if gameover
+        if (self.lives == 0):
+            pygame.mixer.music.stop()
+            game_over_sound.play()
+            
+            display_surface.blit(lose_background_image, lose_background_rect)
+            
+            pygame.draw.rect(display_surface, BLACK, (340, 250, 525, 225))  
+            display_surface.blit(self.game_over_text, self.game_over_rect)
+            display_surface.blit(self.continue_text, self.continue_rect)
+            display_surface.blit(self.score_record_text, self.score_record_rect)
+            pygame.display.update()
+            is_paused = True
+            while is_paused:
+                for event in pygame.event.get():
+                    #The player wants to play again.
+                    if event.type == pygame.KEYDOWN:
+                        if (event.key == pygame.K_SPACE):
+                            #setup as the begin
+                            self.reset()
+                            is_paused = False  
+                            game_over_sound.stop()
+                            pygame.mixer.music.play(-1, 0.0)          
+        
+                    #The player wants to quit
+                    if event.type == pygame.QUIT:
+                        is_paused = False
+                        running = False
+
+
+class mob(pygame.sprite.Sprite):
+    def __init__(self, x, y, mile_stone, time_to_live, Good_or_bad):
+        super().__init__()
+        
+        self.x = x
+        self.y = y
+        self.mile_stone = mile_stone
+        self.Good_or_bad = Good_or_bad
+        self.visited = True
+        self.time_to_live = time_to_live
+        self.animated_sprites = []
+        
+        pic_good = pygame.image.load("khungthanh.png")
+        pic_bad = pygame.image.load("neuer_1.png")
+        
+        pic_good = pygame.transform.scale(pic_good, (pic_good.get_width()/3, pic_good.get_height()/3))
+        pic_bad = pygame.transform.scale(pic_bad, (pic_bad.get_width()/3, pic_bad.get_height()/3))
+        
+        pic_good_2 = pygame.image.load("bongtungluoi.png")
+        pic_bad_2 = pygame.image.load("neuer.png")
+        
+        pic_good_2 = pygame.transform.scale(pic_good_2, (pic_good_2.get_width()/3, pic_good_2.get_height()/3))
+        pic_bad_2 = pygame.transform.scale(pic_bad_2, (pic_bad_2.get_width()/3, pic_bad_2.get_height()/3))
+        
+        self.pic_bad_3 = pygame.image.load("you_missed.png")
+        self.pic_bad_3 = pygame.transform.scale(self.pic_bad_3, (self.pic_bad_3.get_width()/3, self.pic_bad_3.get_height()/3))
+            
+        if (Good_or_bad == True):
+            self.animated_sprites.append(pic_good)
+            self.animated_sprites.append(pic_good_2)
+        else:
+            self.animated_sprites.append(pic_bad)
+            self.animated_sprites.append(pic_bad_2)
+        
+        self.image = self.animated_sprites[0]
+        self.rect = self.image.get_rect()
+        
+        self.rect.centerx = x
+        self.rect.centery = y
+            
+        
+    def update(self):
+        
+        #set time to disappear
+        current_time = pygame.time.get_ticks()
+        if (current_time - self.mile_stone > self.time_to_live - 300):
+            if self.visited == True and self.Good_or_bad == False:
+                self.image = self.pic_bad_3
+        
+        if (current_time - self.mile_stone > self.time_to_live):
+            self.kill()
+        self.rect.center = self.x, self.y
+        
+        
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        
+        #Hammer image=>>ball
+        self.x = x;
+        self.y = y;
+        self.changed_time = 0;
+        
+        self.pic_1 = pygame.image.load("ball.png")
+        self.pic_1 = pygame.transform.scale(self.pic_1, (self.pic_1.get_width()/6, self.pic_1.get_height()/6))
+        self.pic_2 = pygame.image.load("pressed_ball.png")
+        self.pic_2 = pygame.transform.scale(self.pic_2, (self.pic_2.get_width()/6, self.pic_2.get_height()/6))
+
+        
+        self.image = self.pic_1
+        self.rect = self.image.get_rect()
+        
+        #Make the first appearance out of screen
+        self.rect.centerx = x
+        self.rect.centery = y
+
+    def update(self):
+        #after ball get changed an amount of time, get it back to old image
+        current_time = pygame.time.get_ticks()
+        if (current_time - self.changed_time > 300):
+            self.image = self.pic_1
+    
+        self.rect.center = pygame.mouse.get_pos()
+
+    def get_pressed(self):
+        self.changed_time = pygame.time.get_ticks()
+        self.image = self.pic_2
+        
+        
+
+
+Player_group = pygame.sprite.Group()
+Player_1 = Player(0, 0)
+Player_group.add(Player_1)
+
+Mob_group = pygame.sprite.Group()
+
+running_time = pygame.time.get_ticks()
+my_game = Game(Player_group, Mob_group, running_time)
+
+running = True
+while running:        
+       
+    for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            
-        #Check player right click
-        if event.type == pygame.MOUSEBUTTONUP:
-            
-            #Hit the blue mob
-            if hammer_rect.collidepoint(blue_mob_rect.centerx, blue_mob_rect.centery):
-                #time.sleep(0.3)
-                display_surface.blit(blue_mob_image_after, blue_mob_rect)
-                pygame.display.update()
-                time.sleep(0.2)
-                #Draw another mob
-                pass_time = current_time
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                my_game.check_collision()
                 
-                blue_or_green = random.choice([1, 2, 3])
-        
-                #decide where Mob will spawn
-                mob_x = random.choice(list_matrix)
-                mob_y = random.choice(list_matrix)
-        
-                if blue_or_green == 1 or blue_or_green == 2:
-                    mob_rect.centerx = 300*mob_x + 255
-                    mob_rect.centery = 240*mob_y + 120
-            
-                else:
-                    blue_mob_rect.centerx = 300*mob_x + 255
-                    blue_mob_rect.centery = 240*mob_y + 90
-                    
-            
-            #Hit normal mob
-            if hammer_rect.collidepoint(mob_rect.centerx, mob_rect.centery):
-                hit_sound.play()
-                score += 1
-                hit += 1
-                hit_ratio = round(hit/(hit + miss) * 100)
-                #time.sleep(0.3)#################
-                display_surface.blit(mob_image_after, mob_rect)
-                display_surface.blit(score_ronaldo_image, score_ronaldo_rect)
-                pygame.display.update()
-                time.sleep(0.2)
-                
-                #Draw another mob
-                pass_time = current_time
-                
-                blue_or_green = random.choice([1, 2, 3])
-        
-                #decide where Mob will spawn
-                mob_x = random.choice(list_matrix)
-                mob_y = random.choice(list_matrix)
-        
-                if blue_or_green == 1 or blue_or_green == 2:
-                    mob_rect.centerx = 300*mob_x + 255
-                    mob_rect.centery = 240*mob_y + 120
-            
-                else:
-                    blue_mob_rect.centerx = 300*mob_x + 255
-                    blue_mob_rect.centery = 240*mob_y + 90
-            else:
-                lose_sound.play()
-                miss += 1
-                hit_ratio = round(hit/(hit + miss) * 100)
-                player_live -= 1
-         
-    #Update HUD
-    score_text = font.render("Score: " + str(score), True, RED)    
-    player_text = font.render("Live: " + str(player_live), True, RED)   
-    hit_text = font.render("Hit ratio: " + str(hit_ratio) + "%", True, RED)    
-    score_record_text = font.render("Your score is: " + str(score), True, RED, BLUE)
-    
-    center_bg_Rect = pygame.Rect(246,5,400,695)
-    if(score == 7) :
-      if siu_1lan:
-        display_surface.blit(ronaldo_image, center_bg_Rect)  
-        cr7_sound.play() 
-        siu_1lan = 0
-       # pygame.mixer.music.pause()
-        pygame.display.update()
-        pygame.mixer.music.pause()
-        time.sleep(2)
-        pygame.mixer.music.unpause()
-   
-  
-    if (player_live == 0):
-        pygame.mixer.music.stop()
-        game_over_sound.play()
-        
-        display_surface.fill((0,0,0))
-        display_surface.blit(game_over_text, game_over_rect)
-        display_surface.blit(continue_text, continue_rect)
-        display_surface.blit(score_record_text, score_record_rect)
-        pygame.display.update()
-
-        #Pause the game until the player clicks then reset the game
-        is_paused = True
-        while is_paused:
-            for event in pygame.event.get():
-                #The player wants to play again.
-                if event.type == pygame.KEYDOWN:
-                    if (event.key == pygame.K_SPACE):
-                        #setup as the begin
-                        hammer_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2)
-                        hit = 0
-                        miss = 0
-                        hit_ratio = 0
-                        score = 0
-                        player_live = PLAYER_STARTING_LIVES
-                        is_paused = False  
-                        game_over_sound.stop()
-                        pygame.mixer.music.play(-1, 0.0)          
-     
-                #The player wants to quit
-                if event.type == pygame.QUIT:
-                    is_paused = False
-                    running = False
-          
-    #Blit the background
     display_surface.blit(background_image, background_rect)
     display_surface.blit(appearance_image, appearance_rect_1 )
     display_surface.blit(appearance_image, appearance_rect_2 )
@@ -336,23 +400,17 @@ while running:
     display_surface.blit(appearance_image, appearance_rect_6 )
     display_surface.blit(appearance_image, appearance_rect_7 )
     display_surface.blit(appearance_image, appearance_rect_8 )
-    display_surface.blit(appearance_image, appearance_rect_9 )
-                     
-    #Blit HUD             
-    display_surface.blit(score_text, score_rect)
-    display_surface.blit(player_text, player_rect)
-    display_surface.blit(hit_text, hit_rect)
-    
-    #Blit assets
-    if blue_or_green == 1 or blue_or_green == 2:
-        display_surface.blit(mob_image, mob_rect)
+    display_surface.blit(appearance_image, appearance_rect_9 )         
 
-    else:
-        display_surface.blit(blue_mob_image, blue_mob_rect)
-    
-    display_surface.blit(hammer_image, hammer_rect) 
+    Mob_group.update()
+    Mob_group.draw(display_surface)
 
-           
+    Player_group.update()
+    Player_group.draw(display_surface)      
+    
+    my_game.update()
+    my_game.draw()
+    
     #Update the display and tick clock
     pygame.display.update()
     clock.tick(FPS)
