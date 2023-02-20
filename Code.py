@@ -13,6 +13,9 @@ pygame.display.set_caption("Ronaldo vs Neuer")
 FPS = 60
 clock = pygame.time.Clock()
 
+#SET GAME MODE 
+global selectButton
+
 #Set fonts
 font = pygame.font.Font("freesansbold.ttf", 32)
 
@@ -22,7 +25,7 @@ BLUE = (1, 175, 209)
 YELLOW = (255,255,0)
 BLACK = (0, 0, 0)
 
-# backgroung at wait screen
+# background at wait screen
 startGame = True
 start_game_bg_1 =pygame.image.load('start_game_1.jpg')
 start_game_1_rect = start_game_bg_1.get_rect()
@@ -30,13 +33,34 @@ start_game_1_rect = start_game_bg_1.get_rect()
 start_game_bg_2 =pygame.image.load('start_game_2.png')
 start_game_2_rect = start_game_bg_2.get_rect()
 
+# background at select mode
+selectMode = True
+select_mode_bg_1 =pygame.image.load('select_mode_1.png')
+select_mode_rect = select_mode_bg_1.get_rect()
+
+select_mode_bg_2 =pygame.image.load('select_mode_2.png')
+select_mode_rect = select_mode_bg_2.get_rect()
+
+select_mode_bg_3 =pygame.image.load('select_mode_3.png')
+select_mode_rect = select_mode_bg_3.get_rect()
+
+select_mode_bg_4 =pygame.image.load('select_mode_4.png')
+select_mode_rect = select_mode_bg_4.get_rect()
+
 #rectangle bound around play button
 
 buttonRect = pygame.Rect(510, 463, 268, 204)
 
+#rectangle bound around select button
+
+button_normal_rect = pygame.Rect(508, 253, 242, 79)
+button_medium_rect = pygame.Rect(508, 371, 242, 79)
+button_hard_rect = pygame.Rect(508, 489, 242, 79)
+
 #Set images
 #background image
 background_image = pygame.image.load("sanbong.jpg")
+
 background_rect = background_image.get_rect()
 background_rect.topleft = (0, 0)
 
@@ -52,11 +76,15 @@ appearance_rect_1 = pygame.Rect(255-100,100-60,70,70)
 appearance_rect_2 = pygame.Rect(255-100,350-60,70,70)
 appearance_rect_3 = pygame.Rect(555-100,100-60,70,70)
 appearance_rect_4 = pygame.Rect(555-100,350-60,70,70)
-appearance_rect_5 = pygame.Rect(255-100,600-60,70,70)
-appearance_rect_6 = pygame.Rect(855-100,100-60,70,70)
-appearance_rect_7 = pygame.Rect(855-100,600-60,70,70)
-appearance_rect_8 = pygame.Rect(555-100,600-60,70,70)
-appearance_rect_9 = pygame.Rect(855-100,350-60,70,70)
+appearance_rect_5 = pygame.Rect(855-100,100-60,70,70)
+appearance_rect_6 = pygame.Rect(855-100,350-60,70,70)
+appearance_rect_7 = pygame.Rect(555-100,600-60,70,70)
+appearance_rect_8 = pygame.Rect(855-100,600-60,70,70)
+appearance_rect_9 = pygame.Rect(255-100,600-60,70,70)
+appearance_rect_10 = pygame.Rect(405-100,225-60,70,70)
+appearance_rect_11 = pygame.Rect(405-100,475-60,70,70)
+appearance_rect_12 = pygame.Rect(705-100,225-60,70,70)
+appearance_rect_13 = pygame.Rect(705-100,475-60,70,70)
 
 #Create a matrix to store mouse easily
 #0: nothing here
@@ -64,32 +92,78 @@ appearance_rect_9 = pygame.Rect(855-100,350-60,70,70)
 #2: Zombie = -1 (-1 when hit)
 list_matrix = [0,1,2]
 
-inButton = 0
-while startGame :
-    if not inButton :
-        display_surface.blit(start_game_bg_1,background_rect)
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    for event in pygame.event.get():
-        #Check to see if player move the mouse
-        if event.type == pygame.MOUSEMOTION:
-            if buttonRect.collidepoint(mouse_x, mouse_y) :
-                inButton = 1
-                display_surface.blit(start_game_bg_2,background_rect)
-            else :
-                inButton = 0
-        #Check player right click
-        if event.type == pygame.MOUSEBUTTONUP:
-            if buttonRect.collidepoint(mouse_x, mouse_y) :
-                startGame = False
-                break
-        #Check to see if the user wants to quit
-        if event.type == pygame.QUIT:
-            #End the game
-            pygame.quit() 
-            sys.exit()
-    pygame.display.update()
+#while start game
+def HomeScreen(startGame):
+    inButton = 0
+    while startGame :
+        if not inButton :
+            display_surface.blit(start_game_bg_1,background_rect)
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            #Check to see if player move the mouse
+            if event.type == pygame.MOUSEMOTION:
+                if buttonRect.collidepoint(mouse_x, mouse_y) :
+                    inButton = 1
+                    display_surface.blit(start_game_bg_2,background_rect)
+                else :
+                    inButton = 0
+            #Check player right click
+            if event.type == pygame.MOUSEBUTTONUP:
+                if buttonRect.collidepoint(mouse_x, mouse_y) :
+                    startGame = False
+                    break
+            #Check to see if the user wants to quit
+            if event.type == pygame.QUIT:
+                #End the game
+                pygame.quit() 
+                sys.exit()
+        pygame.display.update()
+    
+    
+# while select mode 
+def SelectScreen(selectMode):
+    mouseInbutton = 0
+    while selectMode :
+        if not mouseInbutton :
+            display_surface.blit(select_mode_bg_1,background_rect)
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            #Check to see if player move the mouse
+            if event.type == pygame.MOUSEMOTION:
+                if button_normal_rect.collidepoint(mouse_x, mouse_y) :
+                    mouseInbutton = 1
+                    display_surface.blit(select_mode_bg_2,background_rect)
+                elif button_medium_rect.collidepoint(mouse_x, mouse_y) :
+                    mouseInbutton = 1
+                    display_surface.blit(select_mode_bg_3,background_rect) 
+                elif button_hard_rect.collidepoint(mouse_x, mouse_y) :
+                    mouseInbutton = 1
+                    display_surface.blit(select_mode_bg_4,background_rect)   
+                else :
+                    mouseInbutton = 0
+            #Check player right click
+            if event.type == pygame.MOUSEBUTTONUP:
+                if button_normal_rect.collidepoint(mouse_x, mouse_y) :
+                    selectButton = 1
+                    selectMode= False
+                    break
+                elif button_medium_rect.collidepoint(mouse_x, mouse_y) :
+                    selectButton = 2
+                    selectMode= False
+                    break
+                elif button_hard_rect.collidepoint(mouse_x, mouse_y) :
+                    selectButton = 3
+                    selectMode= False
+                    break
+            #Check to see if the user wants to quit
+            if event.type == pygame.QUIT:
+                #End the game
+                pygame.quit() 
+                sys.exit()
+        pygame.display.update()
+    return selectButton
 
-
+       
 #Set sound and music
 hit_sound = pygame.mixer.Sound("Hit_sound.wav")
 lose_sound = pygame.mixer.Sound("Lose_sound.wav")
@@ -106,9 +180,9 @@ class Game():
         self.hit = 0
         self.miss = 0
         self.pass_time = 0
-        self.STARTING_LIVES = 100
+        self.STARTING_LIVES = 5
         self.lives = self.STARTING_LIVES
-        self.time_to_switch = 1500
+        self.time_to_switch = 2000
 
         self.player_group = player_group
         self.mob_group = mob_group
@@ -168,14 +242,29 @@ class Game():
         if (current_time - self.pass_time >= self.time_to_switch):
             self.pass_time = current_time
             
+            
             list_matrix = [0,1,2]
+            list_matrix_1 = [0,1]
+            list_matrix_2 = [0.5,1.5]
             
             #Kiem tra mob sinh ra co tai vi tri da ton tai mob, neu co random lai
             isNotDuplicated = True
             while isNotDuplicated:
                 isNotDuplicated = False
-                x = random.choice(list_matrix)
-                y = random.choice(list_matrix)
+                if selectButton == 1 :
+                   x = random.choice(list_matrix)
+                   y = random.choice(list_matrix_1)
+                elif selectButton == 2 :
+                   x = random.choice(list_matrix)
+                   y = random.choice(list_matrix)
+                elif selectButton == 3 :
+                    if random.choice([0,1]) :
+                       x = random.choice(list_matrix)
+                       y = random.choice(list_matrix)
+                    else :
+                       x = random.choice(list_matrix_2)
+                       y = random.choice(list_matrix_2)
+                       
                 mob_x = 300*x + 255
                 mob_y = 240*y + 120
                 
@@ -189,12 +278,17 @@ class Game():
             
             #adjust the time of mob to exist
             time_to_live = 2000
-            if (current_time - self.running_time > 10000):
-                    time_to_live = 1500
-            if (current_time - self.running_time > 20000):
-                    time_to_live = 1000
-            if (current_time - self.running_time > 30000):
-                    time_to_live = 500       
+            if (current_time - self.running_time >= 10000 and self.score >= 5):
+                    time_to_live = 1800
+                    self.time_to_switch = 1800
+                
+            if (current_time - self.running_time >= 15000 and self.score >= 10):
+                    time_to_live = 1600
+                    self.time_to_switch = 1600
+            # if (current_time - self.running_time >= 20000):
+            #         time_to_live = 1000
+            # if (current_time - self.running_time > 30000):
+            #         time_to_live = 500       
             
             zombie = mob(mob_x, mob_y, current_time, time_to_live ,Decide_Mob)
             Mob_group.add(zombie)
@@ -294,10 +388,11 @@ class mob(pygame.sprite.Sprite):
         self.animated_sprites = []
         
         pic_good = pygame.image.load("khungthanh.png")
-        pic_bad = pygame.image.load("neuer_1.png")
+        pic_bad = pygame.image.load("khungthanh_neuer.png")
+    
         
         pic_good = pygame.transform.scale(pic_good, (pic_good.get_width()/3, pic_good.get_height()/3))
-        pic_bad = pygame.transform.scale(pic_bad, (pic_bad.get_width()/3, pic_bad.get_height()/3))
+        pic_bad = pygame.transform.scale(pic_bad, (pic_bad.get_width()/2.5, pic_bad.get_height()/2.5))
         
         pic_good_2 = pygame.image.load("bongtungluoi.png")
         pic_bad_2 = pygame.image.load("neuer.png")
@@ -306,7 +401,7 @@ class mob(pygame.sprite.Sprite):
         pic_bad_2 = pygame.transform.scale(pic_bad_2, (pic_bad_2.get_width()/3, pic_bad_2.get_height()/3))
         
         self.pic_bad_3 = pygame.image.load("you_missed.png")
-        self.pic_bad_3 = pygame.transform.scale(self.pic_bad_3, (self.pic_bad_3.get_width()/3, self.pic_bad_3.get_height()/3))
+        self.pic_bad_3 = pygame.transform.scale(self.pic_bad_3, (self.pic_bad_3.get_width()/2, self.pic_bad_3.get_height()/2))########################################
             
         if (Good_or_bad == True):
             self.animated_sprites.append(pic_good)
@@ -326,11 +421,14 @@ class mob(pygame.sprite.Sprite):
         
         #set time to disappear
         current_time = pygame.time.get_ticks()
-        if (current_time - self.mile_stone > self.time_to_live - 300):
+        
+        #idle animation time is the amount of time to needed before appear taunt animation
+        idle_animation_time = self.time_to_live*60/100
+        if (current_time - self.mile_stone >= idle_animation_time):
             if self.visited == True and self.Good_or_bad == False:
                 self.image = self.pic_bad_3
         
-        if (current_time - self.mile_stone > self.time_to_live):
+        if (current_time - self.mile_stone >= self.time_to_live):
             self.kill()
         self.rect.center = self.x, self.y
         
@@ -360,7 +458,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         #after ball get changed an amount of time, get it back to old image
         current_time = pygame.time.get_ticks()
-        if (current_time - self.changed_time > 300):
+        if (current_time - self.changed_time >= 300):
             self.image = self.pic_1
     
         self.rect.center = pygame.mouse.get_pos()
@@ -381,6 +479,10 @@ Mob_group = pygame.sprite.Group()
 running_time = pygame.time.get_ticks()
 my_game = Game(Player_group, Mob_group, running_time)
 
+#run Home and select Mode
+HomeScreen(True)
+selectButton = SelectScreen(True)
+
 running = True
 while running:        
        
@@ -390,6 +492,18 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 my_game.check_collision()
+        #bring back to main screen
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                my_game.reset()
+                HomeScreen(True)
+                selectButton = SelectScreen(True)
+                
+                
+                
+                
+        
+    
                 
     display_surface.blit(background_image, background_rect)
     display_surface.blit(appearance_image, appearance_rect_1 )
@@ -398,9 +512,24 @@ while running:
     display_surface.blit(appearance_image, appearance_rect_4 )
     display_surface.blit(appearance_image, appearance_rect_5 )
     display_surface.blit(appearance_image, appearance_rect_6 )
-    display_surface.blit(appearance_image, appearance_rect_7 )
-    display_surface.blit(appearance_image, appearance_rect_8 )
-    display_surface.blit(appearance_image, appearance_rect_9 )         
+    
+    if selectButton == 2:
+        display_surface.blit(appearance_image, appearance_rect_7 )
+        display_surface.blit(appearance_image, appearance_rect_8 )
+        display_surface.blit(appearance_image, appearance_rect_9 ) 
+    
+    elif selectButton == 3:
+        display_surface.blit(appearance_image, appearance_rect_7 )
+        display_surface.blit(appearance_image, appearance_rect_8 )
+        display_surface.blit(appearance_image, appearance_rect_9 ) 
+        display_surface.blit(appearance_image, appearance_rect_10 )
+        display_surface.blit(appearance_image, appearance_rect_11 )
+        display_surface.blit(appearance_image, appearance_rect_12 )
+        display_surface.blit(appearance_image, appearance_rect_13 )
+        
+
+        
+            
 
     Mob_group.update()
     Mob_group.draw(display_surface)
