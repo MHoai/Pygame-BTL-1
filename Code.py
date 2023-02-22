@@ -293,6 +293,21 @@ class Game():
             zombie = mob(mob_x, mob_y, current_time, time_to_live ,Decide_Mob)
             Mob_group.add(zombie)
             
+    def sieu(self, siu_1lan):
+        if(self.score == 7) :
+            if siu_1lan:
+                cr7_sound.play() 
+                self.siu_1lan = 0
+                center_bg_Rect = pygame.Rect(246,5,400,695)
+                ronaldo_image = pygame.image.load("ronaldo_siu.png")
+                ronaldo_image = pygame.transform.scale(ronaldo_image, (ronaldo_image.get_width()*2.5, ronaldo_image.get_height()*2.5))
+                display_surface.blit(ronaldo_image, center_bg_Rect)
+            # pygame.mixer.music.pause()
+                pygame.display.update()
+                pygame.mixer.music.pause()
+                time.sleep(2)
+                pygame.mixer.music.unpause()
+            
     def check_collision(self):
             #Check Music Button
             for player in self.player_group:
@@ -326,6 +341,8 @@ class Game():
                         
                         self.hit += 1
                         self.hit_ratio = round(self.hit / (self.hit + self.miss) * 100)
+                        
+                        self.sieu(1)
                     else:
                         lose_sound.play()
                         self.lives -= 1
